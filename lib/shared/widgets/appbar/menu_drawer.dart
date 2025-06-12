@@ -1,4 +1,3 @@
-// lib/widgets/menu_drawer.dart
 import 'package:app_m0v4u/shared/widgets/appbar/navbar_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

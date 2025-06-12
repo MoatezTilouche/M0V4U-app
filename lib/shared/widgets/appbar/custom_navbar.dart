@@ -1,6 +1,8 @@
+import 'package:app_m0v4u/constants/assets.dart';
+import 'package:app_m0v4u/constants/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'navbar_provider.dart'; // Import the provider for NavBarState
+import 'navbar_provider.dart';
 
 class CustomNavBar extends StatefulWidget implements PreferredSizeWidget {
   const CustomNavBar({super.key});
@@ -18,98 +20,81 @@ class _CustomNavBarState extends State<CustomNavBar> {
   @override
   void initState() {
     super.initState();
-    navState = context
-        .read<NavBarState>(); // Reading the provider for one-time use
-
-    // // Initialize the navState properly
-    // navState.toggleMenu();  // Optional, based on your app's logic
-    // navState.toggleSearch();  // Optional, based on your app's logic
-    // navState.setSearchQuery(''); // Optional, based on your app's logic
-    // navState.closeAll();  // Optional, based on your app's logic
+    navState = context.read<NavBarState>();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Listen to navState using Consumer or context.watch() to rebuild when changes occur
     return Consumer<NavBarState>(
       builder: (context, navState, _) {
         return AppBar(
-          backgroundColor: const Color(0xFF112155),
+          backgroundColor: AppStyles.secondaryColor,
           leading: IconButton(
             icon: Image.asset(
-              'assets/menu.png', // Path to your downloaded icon image
-              height: 30.0, // Adjust the size of the icon
-              width: 30.0, // Adjust the size of the icon
+              Assets.menuIcon,
+              height: 30.0,
+              width: 30.0,
             ),
             onPressed: () {
               navState.toggleMenu();
               Scaffold.of(
                 context,
-              ).openDrawer(); // Open drawer when menu button is pressed
+              ).openDrawer();
             },
           ),
           title: navState.isSearchActive
               ? TextField(
-            autofocus: true,
-            style: const TextStyle(color: Colors.white),
-            decoration: const InputDecoration(
-              hintText: 'Search...',
-              hintStyle: TextStyle(color: Colors.white70),
-              border: InputBorder.none,
-            ),
-            onChanged: (value) => navState.setSearchQuery(value),
-          )
+                  autofocus: true,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: const InputDecoration(
+                    hintText: 'Search...',
+                    hintStyle: TextStyle(color: Colors.white70),
+                    border: InputBorder.none,
+                  ),
+                  onChanged: (value) => navState.setSearchQuery(value),
+                )
               : Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Image.asset(
-                'assets/logo.png', // Path to your downloaded icon image
-                height: 24.0, // Adjust the size of the icon
-                width: 24.0, // Adjust the size of the icon
-              ),
-              const SizedBox(width: 8),
-              const Text(
-                'M0V4U',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Image.asset(
+                      Assets.appLogoIcon,
+                      height: 24.0,
+                      width: 24.0,
+                    ),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'M0V4U',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
           actions: [
             IconButton(
               icon: Image.asset(
-                navState.isSearchActive
-                    ? 'assets/close.png'
-                    : 'assets/search.png',
+                navState.isSearchActive ? Assets.closeIcon : Assets.searchIcon,
                 height: 26.0,
                 width: 26.0,
               ),
               onPressed: () {
                 if (navState.isSearchActive) {
-                  navState.setSearchQuery(''); // Clear search query if active
+                  navState.setSearchQuery('');
                 }
                 navState.toggleSearch();
               },
             ),
-
             IconButton(
               icon: Image.asset(
-                'assets/user.png',
-                height:
-                35.0,
-                width:
-                35.0,
-                fit: BoxFit
-                    .cover,
+                Assets.userIcon,
+                height: 35.0,
+                width: 35.0,
+                fit: BoxFit.cover,
               ),
-
-              onPressed: () {
-
-              },
+              onPressed: () {},
             ),
           ],
         );

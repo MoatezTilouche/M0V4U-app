@@ -1,11 +1,10 @@
-// lib/main.dart
 import 'package:app_m0v4u/shared/widgets/appbar/custom_navbar.dart';
 import 'package:app_m0v4u/shared/widgets/appbar/menu_drawer.dart';
 import 'package:app_m0v4u/shared/widgets/appbar/navbar_provider.dart';
 import 'package:app_m0v4u/ui/home_screen/providers/home_screen_provider.dart';
+import 'package:app_m0v4u/ui/home_screen/views/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 
 void main() {
   runApp(
@@ -31,7 +30,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.red,
         scaffoldBackgroundColor: Colors.black,
       ),
-      home: const MainScreen(),
+      home: const HomeScreen(),
     );
   }
 }
