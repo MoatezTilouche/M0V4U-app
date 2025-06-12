@@ -1,15 +1,20 @@
 // lib/main.dart
-import 'package:app_m0v4u/pages/navbar/customNavbar.dart';
-import 'package:app_m0v4u/pages/navbar/menuDrawer.dart';
-import 'package:app_m0v4u/pages/navbar/navbarProvider.dart';
+import 'package:app_m0v4u/shared/widgets/appbar/custom_navbar.dart';
+import 'package:app_m0v4u/shared/widgets/appbar/menu_drawer.dart';
+import 'package:app_m0v4u/shared/widgets/appbar/navbar_provider.dart';
+import 'package:app_m0v4u/ui/home_screen/providers/home_screen_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => NavBarState(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => NavBarState()),
+        ChangeNotifierProvider(create: (_) => HomeScreenProvider()),
+        // Add more providers here
+      ],
       child: const MyApp(),
     ),
   );
