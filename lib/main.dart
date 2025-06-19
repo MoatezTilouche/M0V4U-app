@@ -1,10 +1,9 @@
-
 import 'package:app_m0v4u/shared/widgets/appbar/navbar_provider.dart';
 import 'package:app_m0v4u/ui/actor/providers/actor_provider.dart';
 import 'package:app_m0v4u/ui/genre_screen/providers/genre_provider.dart';
 import 'package:app_m0v4u/ui/home_screen/providers/home_screen_provider.dart';
-import 'package:app_m0v4u/ui/home_screen/views/home_screen.dart';
 import 'package:app_m0v4u/ui/movie_screen/providers/movie_provider.dart';
+import 'package:app_m0v4u/ui/movies/providers/movies_provider.dart';
 import 'package:app_m0v4u/ui/splash_screen.dart';
 import 'package:app_m0v4u/ui/trailer_screen/providers/trailer_provider.dart';
 import 'package:app_m0v4u/ui/trailer_screen/providers/youtube_provider.dart';
@@ -21,9 +20,9 @@ void main() {
         ChangeNotifierProvider(create: (_) => TrailerProvider()),
         ChangeNotifierProvider(create: (_) => YouTubeProvider()),
         ChangeNotifierProvider(create: (_) => MovieDetailProvider()),
-        ChangeNotifierProvider(create: (_) => ActorProvider())
+        ChangeNotifierProvider(create: (_) => ActorProvider()),
+        ChangeNotifierProvider(create: (_) => MoviesProvider())
 
-        // Add more providers here
       ],
       child: const MyApp(),
     ),

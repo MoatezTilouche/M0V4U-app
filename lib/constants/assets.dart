@@ -10,6 +10,8 @@ class Assets {
   static const pLusIcon = 'assets/voir-plus.png';
   static const homeAppbar = 'assets/appbar_home.png';
   static const playIcon = 'assets/playIcon.png';
+  static const nextIcon = 'assets/next.png';
+  static const prevIcon = 'assets/back.png';
 
   static const actorsAppbar = 'assets/appbar_actors.png';
   static const moviesAppbar = 'assets/appbar_movies.png';

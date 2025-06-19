@@ -1,6 +1,9 @@
 import 'package:app_m0v4u/constants/assets.dart';
 import 'package:app_m0v4u/constants/styles.dart';
+import 'package:app_m0v4u/shared/widgets/animations/animation_navigator.dart';
 import 'package:app_m0v4u/shared/widgets/appbar/navbar_provider.dart';
+import 'package:app_m0v4u/ui/home_screen/views/home_screen.dart';
+import 'package:app_m0v4u/ui/movies/movies_screen/movies_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -48,8 +51,7 @@ class MenuDrawer extends StatelessWidget {
             ),
             title: const Text('Home', style: TextStyle(color: Colors.white)),
             onTap: () {
-              navState.closeAll();
-              Navigator.pop(context);
+              AnimatedNavigator.pushZoomIn(context, HomeScreen());
             },
           ),
           ListTile(
@@ -60,8 +62,7 @@ class MenuDrawer extends StatelessWidget {
             ),
             title: const Text('Movies', style: TextStyle(color: Colors.white)),
             onTap: () {
-              navState.closeAll();
-              Navigator.pop(context);
+              AnimatedNavigator.pushZoomIn(context, MoviesScreen());
             },
           ),
           ListTile(
@@ -70,8 +71,7 @@ class MenuDrawer extends StatelessWidget {
               height: 30.0,
               width: 30.0,
             ),
-            title:
-                const Text('Actors', style: TextStyle(color: Colors.white)),
+            title: const Text('Actors', style: TextStyle(color: Colors.white)),
             onTap: () {
               navState.closeAll();
               Navigator.pop(context);
@@ -80,10 +80,10 @@ class MenuDrawer extends StatelessWidget {
           const Divider(color: Colors.grey),
           ListTile(
             leading: Image.asset(
-                      Assets.trailersAppbar,
-                      height: 30.0,
-                      width: 30.0,
-                    ),
+              Assets.trailersAppbar,
+              height: 30.0,
+              width: 30.0,
+            ),
             title:
                 const Text('Trailers', style: TextStyle(color: Colors.white)),
             onTap: () {

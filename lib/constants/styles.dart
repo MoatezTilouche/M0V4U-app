@@ -7,6 +7,7 @@ class AppStyles {
   static const Color secondaryColor = Color(0xFF112155);
   static const Color darkColor = Color(0xFF09122C);
   static const Color textColor = Color(0xFF000000);
+    static const Color whiteBlue =  Color(0xFFc1f7ff);
 
   static const TextStyle headline1 = TextStyle(
     fontSize: 32.0,

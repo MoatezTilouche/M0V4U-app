@@ -72,19 +72,7 @@ class _ActorHomeCarouselState extends State<ActorHomeCarousel> {
             },
           ),
         ),
-        const SizedBox(height: 12),
-        Center(
-          child: SmoothPageIndicator(
-            controller: _pageController,
-            count: widget.actors.length,
-            effect: const WormEffect(
-              dotHeight: 6,
-              dotWidth: 6,
-              activeDotColor: AppStyles.secondaryColor,
-              dotColor: Colors.grey,
-            ),
-          ),
-        ),
+        
       ],
     );
   }
