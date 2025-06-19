@@ -1,3 +1,5 @@
+import 'package:app_m0v4u/constants/assets.dart';
+import 'package:app_m0v4u/constants/styles.dart';
 import 'package:app_m0v4u/shared/widgets/appbar/navbar_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -10,18 +12,22 @@ class MenuDrawer extends StatelessWidget {
     final navState = Provider.of<NavBarState>(context, listen: false);
 
     return Drawer(
-      backgroundColor: Colors.black87,
+      backgroundColor: AppStyles.darkColor,
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
           DrawerHeader(
             decoration: const BoxDecoration(
-              color: Colors.red,
+              color: AppStyles.secondaryColor,
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.movie, size: 50, color: Colors.white),
+                Image.asset(
+                  Assets.appLogoIcon,
+                  height: 50.0,
+                  width: 50.0,
+                ),
                 const SizedBox(height: 10),
                 const Text(
                   'M0V4U',
@@ -35,7 +41,11 @@ class MenuDrawer extends StatelessWidget {
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.home, color: Colors.white),
+            leading: Image.asset(
+              Assets.homeAppbar,
+              height: 30.0,
+              width: 30.0,
+            ),
             title: const Text('Home', style: TextStyle(color: Colors.white)),
             onTap: () {
               navState.closeAll();
@@ -43,7 +53,11 @@ class MenuDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.movie_filter, color: Colors.white),
+            leading: Image.asset(
+              Assets.moviesAppbar,
+              height: 30.0,
+              width: 30.0,
+            ),
             title: const Text('Movies', style: TextStyle(color: Colors.white)),
             onTap: () {
               navState.closeAll();
@@ -51,8 +65,13 @@ class MenuDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.tv, color: Colors.white),
-            title: const Text('TV Shows', style: TextStyle(color: Colors.white)),
+            leading: Image.asset(
+              Assets.actorsAppbar,
+              height: 30.0,
+              width: 30.0,
+            ),
+            title:
+                const Text('Actors', style: TextStyle(color: Colors.white)),
             onTap: () {
               navState.closeAll();
               Navigator.pop(context);
@@ -60,8 +79,13 @@ class MenuDrawer extends StatelessWidget {
           ),
           const Divider(color: Colors.grey),
           ListTile(
-            leading: const Icon(Icons.settings, color: Colors.white),
-            title: const Text('Settings', style: TextStyle(color: Colors.white)),
+            leading: Image.asset(
+                      Assets.trailersAppbar,
+                      height: 30.0,
+                      width: 30.0,
+                    ),
+            title:
+                const Text('Trailers', style: TextStyle(color: Colors.white)),
             onTap: () {
               navState.closeAll();
               Navigator.pop(context);
