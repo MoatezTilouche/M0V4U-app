@@ -10,7 +10,7 @@ import 'package:app_m0v4u/ui/actor/view/actor_screen.dart';
 
 import '../../../shared/widgets/appbar/custom_navbar.dart';
 import '../../../shared/widgets/appbar/menu_drawer.dart';
-import '../../../shared/widgets/bottomBar/bottomBar.dart';
+import '../../../shared/widgets/bottomBar/bottom_bar.dart';
 import '../../actor/models/actor.dart';
 import '../providers/actor_screen_provider.dart';
 
@@ -68,8 +68,7 @@ class _ActorsScreenState extends State<ActorsScreen> with SingleTickerProviderSt
 
   void _onScroll() {
     final provider = Provider.of<ActorsProvider>(context, listen: false);
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent &&
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent &&
         !provider.isLoading &&
         provider.hasMorePages(_tabController.index)) {
       switch (_tabController.index) {
@@ -97,12 +96,10 @@ class _ActorsScreenState extends State<ActorsScreen> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: widget._scaffoldKey, // Use the scaffold key here
-      backgroundColor: AppStyles.primaryColor,
-      appBar: CustomNavBar(),
-      drawer: MenuDrawer(),
-      body: Column(
+    return SizedBox(
+      height: MediaQuery.of(context).size.height,
+      width: double.infinity,
+      child: Column(
         children: [
           // Search Section
           Container(
@@ -155,91 +152,90 @@ class _ActorsScreenState extends State<ActorsScreen> with SingleTickerProviderSt
               if (provider.errorMessage != null && !provider.isLoading) {
                 return Center(child: Text(provider.errorMessage!));
               }
-              List<Actor> actorsToDisplay = _tabController.index == 1 && searchQuery.isNotEmpty
-                  ? provider.searchResults
-                  : provider.popularActors;
+              List<Actor> actorsToDisplay =
+                  _tabController.index == 1 && searchQuery.isNotEmpty ? provider.searchResults : provider.popularActors;
 
               return Skeletonizer(
                 enabled: provider.isLoading && actorsToDisplay.isEmpty,
                 child: actorsToDisplay.isEmpty && !provider.isLoading
                     ? Center(child: Text('No actors found'))
                     : GridView.builder(
-                  controller: _scrollController,
-                  padding: const EdgeInsets.all(8.0),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 10.0,
-                    mainAxisSpacing: 20.0,
-                    childAspectRatio: 1 / 1.3,
-                  ),
-                  itemCount: actorsToDisplay.length,
-                  itemBuilder: (context, index) {
-                    final actor = actorsToDisplay[index];
-                    return GestureDetector(
-                      onTap: () {
-                        AnimatedNavigator.pushZoomIn(
-                          context,
-                          ActorScreen(actorId: actor.id!),
-                        );
-                      },
-                      child: Card(
-                        color: AppStyles.cardColor,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
+                        controller: _scrollController,
+                        padding: const EdgeInsets.all(8.0),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 10.0,
+                          mainAxisSpacing: 20.0,
+                          childAspectRatio: 1 / 1.3,
                         ),
-                        elevation: 4,
-                        child: Column(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(16),
-                                topRight: Radius.circular(16),
+                        itemCount: actorsToDisplay.length,
+                        itemBuilder: (context, index) {
+                          final actor = actorsToDisplay[index];
+                          return GestureDetector(
+                            onTap: () {
+                              AnimatedNavigator.pushZoomIn(
+                                context,
+                                ActorScreen(actorId: actor.id!),
+                              );
+                            },
+                            child: Card(
+                              color: AppStyles.cardColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
                               ),
-                              child: Image.network(
-                                'https://image.tmdb.org/t/p/w500${actor.profilePath ?? ''}',
-                                width: double.infinity,
-                                height: 170,
-                                fit: BoxFit.fill,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Container(
-                                    width: double.infinity,
-                                    height: 160,
-                                    color: Colors.grey[300],
-                                    child: Icon(Icons.person,
-                                        size: 50, color: Colors.grey[600]),
-                                  );
-                                },
+                              elevation: 4,
+                              child: Column(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(16),
+                                      topRight: Radius.circular(16),
+                                    ),
+                                    child: Image.network(
+                                      'https://image.tmdb.org/t/p/w500${actor.profilePath ?? ''}',
+                                      width: double.infinity,
+                                      height: 170,
+                                      fit: BoxFit.fill,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Container(
+                                          width: double.infinity,
+                                          height: 160,
+                                          color: Colors.grey[300],
+                                          child: Icon(Icons.person, size: 50, color: Colors.grey[600]),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(2.0),
+                                    child: SizedBox(
+                                      width: double.infinity,
+                                      height: 35,
+                                      child: Center(
+                                        child: AutoSizeText(
+                                          maxLines: 2,
+                                          actor.name ?? "Unknown Actor",
+                                          textAlign: TextAlign.center,
+                                          minFontSize: 8,
+                                          maxFontSize: 12,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: AutoSizeText(
-                                maxLines: 2,
-                                actor.name ?? "Unknown Actor",
-                                textAlign: TextAlign.center,
-                                minFontSize: 8,
-                                maxFontSize: 12,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
               );
             }),
           ),
         ],
       ),
-      bottomNavigationBar: AppBottomAppBar(
-        selectedIndex: 1, // Actors screen index
-        scaffoldKey: widget._scaffoldKey,
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }

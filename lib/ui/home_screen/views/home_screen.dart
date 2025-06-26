@@ -13,14 +13,14 @@ import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../constants/assets.dart';
 import '../../../shared/widgets/animations/animation_navigator.dart';
-import '../../../shared/widgets/bottomBar/bottomBar.dart';
+import '../../../shared/widgets/bottomBar/bottom_bar.dart';
 import '../../movies/movies_screen/movies_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   // Define the GlobalKey here instead of passing it as a const
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-   HomeScreen({super.key});
+  HomeScreen({super.key});
 
   bool get selectedLove => false;
 
@@ -28,8 +28,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<HomeScreenProvider>(
       builder: (context, home_provider, _) {
-        if (home_provider.popularMovies.isEmpty &&
-            home_provider.popularActors.isEmpty) {
+        if (home_provider.popularMovies.isEmpty && home_provider.popularActors.isEmpty) {
           home_provider.fetchPopularMovies();
           home_provider.fetchPopularActors();
         }
@@ -37,8 +36,6 @@ class HomeScreen extends StatelessWidget {
         return Scaffold(
           key: _scaffoldKey, // Use the scaffold key here
           backgroundColor: AppStyles.primaryColor,
-          appBar: const CustomNavBar(),
-          drawer: const MenuDrawer(),
           body: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(0.0),
@@ -83,18 +80,15 @@ class HomeScreen extends StatelessWidget {
                   // Trending Movies List
                   home_provider.popularMovies.isNotEmpty
                       ? Skeletonizer(
-                    enabled: home_provider.isLoading,
-                    child: MovieCarousel(
-                        movies: home_provider.popularMovies
-                            .take(10)
-                            .toList()),
-                  )
+                          enabled: home_provider.isLoading,
+                          child: MovieCarousel(movies: home_provider.popularMovies.take(10).toList()),
+                        )
                       : const Center(
-                    child: Text(
-                      'Aucun film tendance trouvé',
-                      style: TextStyle(color: Colors.white70),
-                    ),
-                  ),
+                          child: Text(
+                            'Aucun film tendance trouvé',
+                            style: TextStyle(color: Colors.white70),
+                          ),
+                        ),
                   const SizedBox(height: 20),
                   Skeletonizer(
                     enabled: home_provider.isLoading,
@@ -145,16 +139,15 @@ class HomeScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   home_provider.popularActors.isNotEmpty
                       ? Skeletonizer(
-                    enabled: home_provider.isLoading,
-                    child: ActorHomeCarousel(
-                        actors: home_provider.popularActors.take(7).toList()),
-                  )
+                          enabled: home_provider.isLoading,
+                          child: ActorHomeCarousel(actors: home_provider.popularActors.take(7).toList()),
+                        )
                       : const Center(
-                    child: Text(
-                      'Aucun acteur populaire trouvé',
-                      style: TextStyle(color: Colors.white70),
-                    ),
-                  ),
+                          child: Text(
+                            'Aucun acteur populaire trouvé',
+                            style: TextStyle(color: Colors.white70),
+                          ),
+                        ),
                   const SizedBox(height: 8),
                   Skeletonizer(
                     enabled: home_provider.isLoading,
@@ -164,12 +157,6 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
           ),
-          bottomNavigationBar: AppBottomAppBar(
-            selectedIndex: 0, // Home screen index
-            scaffoldKey: _scaffoldKey,
-          ),
-
-          floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         );
       },
     );

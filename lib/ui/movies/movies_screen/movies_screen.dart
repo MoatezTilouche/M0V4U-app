@@ -10,7 +10,7 @@ import 'package:app_m0v4u/shared/widgets/appbar/custom_navbar.dart';
 import 'package:app_m0v4u/shared/widgets/appbar/menu_drawer.dart';
 import 'package:app_m0v4u/shared/widgets/animations/animation_navigator.dart';
 import 'package:app_m0v4u/ui/movie_screen/view/movie_screen.dart';
-import 'package:app_m0v4u/shared/widgets/bottomBar/bottomBar.dart';
+import 'package:app_m0v4u/shared/widgets/bottomBar/bottom_bar.dart';
 
 import '../../../constants/assets.dart';
 import '../../../constants/styles.dart';
@@ -75,8 +75,7 @@ class _MoviesScreenState extends State<MoviesScreen> with SingleTickerProviderSt
 
   void _onScroll() {
     final provider = Provider.of<MoviesProvider>(context, listen: false);
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent &&
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent &&
         !provider.isLoading &&
         provider.hasMorePages(_tabController.index)) {
       switch (_tabController.index) {
@@ -110,13 +109,10 @@ class _MoviesScreenState extends State<MoviesScreen> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: widget._scaffoldKey, // Use the scaffold key here
-
-      backgroundColor: Colors.white,
-      appBar: CustomNavBar(),
-      drawer: MenuDrawer(),
-      body: Column(
+    return SizedBox(
+      height: MediaQuery.of(context).size.height,
+      width: double.infinity,
+      child: Column(
         children: [
           // Search Section
           Container(
@@ -131,9 +127,7 @@ class _MoviesScreenState extends State<MoviesScreen> with SingleTickerProviderSt
                   hintText: 'Search movies...',
                   filled: true,
                   fillColor: Colors.grey.shade100,
-                  border: OutlineInputBorder(
-                      borderRadius : const BorderRadius.all(Radius.circular(14.0))
-                  ),
+                  border: OutlineInputBorder(borderRadius: const BorderRadius.all(Radius.circular(14.0))),
                   prefixIcon: IconButton(
                     icon: Image.asset(
                       Assets.searchIcon,
@@ -244,8 +238,7 @@ class _MoviesScreenState extends State<MoviesScreen> with SingleTickerProviderSt
                     mainAxisSpacing: 20.0,
                     childAspectRatio: 1 / 1.3,
                   ),
-                  itemCount: moviesToDisplay.length +
-                      (hasMorePages && provider.isLoading ? 2 : 0),
+                  itemCount: moviesToDisplay.length + (hasMorePages && provider.isLoading ? 2 : 0),
                   itemBuilder: (context, index) {
                     if (index >= moviesToDisplay.length) {
                       return Card(
@@ -265,8 +258,7 @@ class _MoviesScreenState extends State<MoviesScreen> with SingleTickerProviderSt
                       elevation: 4,
                       child: GestureDetector(
                         onTap: () {
-                          AnimatedNavigator.pushZoomIn(
-                              context, MovieDetailScreen(movieId: movie.id!));
+                          AnimatedNavigator.pushZoomIn(context, MovieDetailScreen(movieId: movie.id!));
                         },
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -286,8 +278,7 @@ class _MoviesScreenState extends State<MoviesScreen> with SingleTickerProviderSt
                                     width: double.infinity,
                                     height: 160,
                                     color: Colors.grey[300],
-                                    child: Icon(Icons.movie_filter,
-                                        size: 50, color: Colors.grey[600]),
+                                    child: Icon(Icons.movie_filter, size: 50, color: Colors.grey[600]),
                                   );
                                 },
                               ),
@@ -322,11 +313,6 @@ class _MoviesScreenState extends State<MoviesScreen> with SingleTickerProviderSt
           ),
         ],
       ),
-      bottomNavigationBar: AppBottomAppBar(
-        selectedIndex: 3,
-        scaffoldKey: widget._scaffoldKey,
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }
