@@ -2,6 +2,7 @@ import 'package:app_m0v4u/constants/assets.dart';
 import 'package:app_m0v4u/constants/styles.dart';
 import 'package:app_m0v4u/shared/widgets/animations/animation_navigator.dart';
 import 'package:app_m0v4u/shared/widgets/appbar/navbar_provider.dart';
+import 'package:app_m0v4u/ui/actor_screen/views/actors_screen.dart';
 import 'package:app_m0v4u/ui/home_screen/views/home_screen.dart';
 import 'package:app_m0v4u/ui/movies/movies_screen/movies_screen.dart';
 import 'package:flutter/material.dart';
@@ -73,8 +74,9 @@ class MenuDrawer extends StatelessWidget {
             ),
             title: const Text('Actors', style: TextStyle(color: Colors.white)),
             onTap: () {
-              navState.closeAll();
-              Navigator.pop(context);
+
+                AnimatedNavigator.pushZoomIn(context, ActorsScreen());
+
             },
           ),
           const Divider(color: Colors.grey),

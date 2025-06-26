@@ -43,7 +43,7 @@ class _ActorHomeCarouselState extends State<ActorHomeCarousel> {
       children: [
         const SizedBox(height: 12),
         SizedBox(
-          height: 220, 
+          height: 200, 
           child: PageView.builder(
             controller: _pageController,
             itemCount: widget.actors.length,

@@ -1,6 +1,7 @@
 import 'package:app_m0v4u/constants/styles.dart';
 import 'package:app_m0v4u/shared/widgets/animations/animated_route.dart';
 import 'package:app_m0v4u/ui/home_screen/views/home_screen.dart';
+import 'package:app_m0v4u/ui/mainScreen/main_screen.dart';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -18,7 +19,7 @@ class _SplashScreenState extends State<SplashScreen> {
     Future.delayed(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
-        AnimatedRoute.slideFromBottom(const HomeScreen()),
+        AnimatedRoute.slideFromBottom(MainScreen()),
       );
     });
   }

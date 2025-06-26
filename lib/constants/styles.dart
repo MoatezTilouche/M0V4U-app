@@ -8,6 +8,7 @@ class AppStyles {
   static const Color darkColor = Color(0xFF09122C);
   static const Color textColor = Color(0xFF000000);
     static const Color whiteBlue =  Color(0xFFc1f7ff);
+    static const Color cardColor=Color(0xFFF8f9fb);
 
   static const TextStyle headline1 = TextStyle(
     fontSize: 32.0,

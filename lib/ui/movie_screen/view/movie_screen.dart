@@ -9,15 +9,18 @@ import 'package:app_m0v4u/shared/widgets/appbar/menu_drawer.dart';
 import 'package:app_m0v4u/ui/movie_screen/providers/movie_provider.dart';
 
 class MovieDetailScreen extends StatelessWidget {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   final int movieId;
 
-  const MovieDetailScreen({super.key, required this.movieId});
+  MovieDetailScreen({super.key, required this.movieId});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => MovieDetailProvider()..loadMovie(movieId),
       child: Scaffold(
+
         extendBodyBehindAppBar: true,
         backgroundColor: AppStyles.primaryColor,
         appBar: const CustomNavBar(),

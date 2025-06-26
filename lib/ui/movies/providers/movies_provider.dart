@@ -15,11 +15,17 @@ class MoviesProvider with ChangeNotifier {
   int currentUpcomingPage = 1;
   int currentTopRatedPage = 1;
   int currentNowPlayingPage = 1;
+  int currentSearchPage = 1; // For search pagination
 
   bool popularHasMorePages = true;
   bool upcomingHasMorePages = true;
   bool topRatedHasMorePages = true;
   bool nowPlayingHasMorePages = true;
+  List<Result> searchResults = []; // To store the search results
+  bool searchHasMorePages = true; // For search pagination
+
+  String searchQuery = '';
+
 
   Future<void> fetchPopularMovies() async {
     if (!popularHasMorePages || isLoading) return;
@@ -137,6 +143,28 @@ class MoviesProvider with ChangeNotifier {
         return nowPlayingHasMorePages;
       default:
         return false;
+    }
+  }
+
+// Method to search movies
+  Future<void> searchMovies(String query) async {
+    if (query.isEmpty) {
+      searchResults = [];  // Clear the search results if query is empty
+      notifyListeners();
+      return;
+    }
+
+    isLoading = true;
+    notifyListeners();
+
+    try {
+      final results = await _moviesService.searchMovies(query, 1);
+      searchResults = results;
+    } catch (e) {
+      print('Error searching movies: $e');
+    } finally {
+      isLoading = false;
+      notifyListeners();
     }
   }
 }

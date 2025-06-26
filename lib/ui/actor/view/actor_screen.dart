@@ -26,6 +26,7 @@ class _ActorScreenState extends State<ActorScreen> {
       create: (_) => ActorProvider()..loadActor(widget.actorId),
       child: Scaffold(
         appBar: const CustomNavBar(),
+
         backgroundColor: AppStyles.primaryColor,
         body: Consumer<ActorProvider>(
           builder: (context, provider, _) {

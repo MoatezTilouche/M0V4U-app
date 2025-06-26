@@ -2,6 +2,8 @@ import 'package:app_m0v4u/constants/constants.dart';
 import 'package:app_m0v4u/ui/movies/models/movies.dart';
 import 'package:dio/dio.dart';
 
+import '../ui/home_screen/models/movie_model.dart';
+
 class MoviesService {
   final Dio _dio = Dio();
   final String _apiKey = apiKey;  // Replace with your API key
@@ -90,4 +92,32 @@ class MoviesService {
       throw Exception('Error fetching now playing movies');
     }
   }
+  Future<List<Result>> searchMovies(String query, int page) async {
+    try {
+      final response = await _dio.get(
+        '$_baseUrl/search/movie',
+        queryParameters: {
+          'api_key': _apiKey,
+          'language': 'en-US',
+          'query': query,
+          'page': page,
+        },
+      );
+
+      print('Status Code: ${response.statusCode}');
+      print('Response: ${response.data}');
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = response.data['results'];
+        return data.map((movieJson) => Result.fromJson(movieJson)).toList();
+      } else {
+        throw Exception('Failed to search movies');
+      }
+    } catch (e) {
+      print("Error: $e");
+      throw Exception('Error searching movies');
+    }
+  }
+
+
 }

@@ -1,5 +1,5 @@
 import 'package:app_m0v4u/constants/constants.dart';
-import 'package:app_m0v4u/ui/home_screen/models/movie_model.dart';
+  import 'package:app_m0v4u/ui/home_screen/models/movie_model.dart';
 import 'package:app_m0v4u/ui/movie_screen/models/movie.dart' hide Movie;
 import 'package:dio/dio.dart';
 

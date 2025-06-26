@@ -60,35 +60,70 @@ class GenreService {
   // Helper function to check if the genre is one of the specific genres
   bool _isSpecificGenre(int id) {
     const specificGenreIds = [
-      12,   // Adventure
-      35,   // Comedy
-      80,   // Crime
-      27,   // Horror
-      10749,// Romance
-      10402 // Music
+      12,    // Adventure
+      35,    // Comedy
+      80,    // Crime
+      27,    // Horror
+      10749, // Romance
+      10402, // Music
+      28,    // Action
+      18,    // Drama
+      99,    // Documentary
+      53,    // Thriller
+      878,   // Sci-Fi
+      10752, //war
+      36,    // History
+      37,    // Western
+      10751, // Family
+      16,
+      14,// Animation
     ];
 
     return specificGenreIds.contains(id);
   }
 
+
   // Map genre IDs to asset icons
   String _getIconForGenre(int id) {
     switch (id) {
-      case 12: // Adventure
+      case 12:   // Adventure
         return Assets.adventure;
-      case 35: // Comedy
+      case 35:   // Comedy
         return Assets.comedy;
-      case 80: // Crime
+      case 80:   // Crime
         return Assets.crime;
-     
-      case 27: // Horror
+      case 27:   // Horror
         return Assets.horror;
-      case 10749: // Romance
+      case 10749:// Romance
         return Assets.romance;
-        case 10402: // Music
-        return Assets.music;  
+      case 10402:// Music
+        return Assets.music;
+      case 28:   // Action
+        return Assets.action;
+      case 18:   // Drama
+        return Assets.drama;
+      case 99:   // Documentary
+        return Assets.documentary;
+      case 53:   // Thriller
+        return Assets.thriller;
+      case 878:  // Sci-Fi
+        return Assets.scienceFiction;
+      case 14:   // Fantasy
+        return Assets.fantasy;
+      case 36:   // History
+        return Assets.history;
+
+      case 10751:// Family
+        return Assets.family;
+      case 16:   // Animation
+        return Assets.animation;
+      case 10752: // War
+        return Assets.war;
+      case 37:   // Western
+        return Assets.western;
       default:
         return Assets.pLusIcon; // Default icon for others
     }
   }
+
 }
