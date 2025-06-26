@@ -31,15 +31,12 @@ class _CustomNavBarState extends State<CustomNavBar> {
           backgroundColor: AppStyles.secondaryColor,
           leading: IconButton(
             icon: Image.asset(
-              Assets.menuIcon,
+              Assets.prevIcon,
               height: 30.0,
               width: 30.0,
             ),
             onPressed: () {
-              navState.toggleMenu();
-              Scaffold.of(
-                context,
-              ).openDrawer();
+              Navigator.pop(context);
             },
           ),
           title: navState.isSearchActive
