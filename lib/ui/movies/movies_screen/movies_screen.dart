@@ -16,7 +16,8 @@ import '../../../constants/assets.dart';
 import '../../../constants/styles.dart';
 
 class MoviesScreen extends StatefulWidget {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+
 
   @override
   _MoviesScreenState createState() => _MoviesScreenState();
@@ -27,6 +28,7 @@ class _MoviesScreenState extends State<MoviesScreen> with SingleTickerProviderSt
   late ScrollController _scrollController;
   String searchQuery = '';
   Timer? _debounce;
+
 
   @override
   void initState() {

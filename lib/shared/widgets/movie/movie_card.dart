@@ -25,7 +25,7 @@ class MovieCard extends StatelessWidget {
       onTap: () {
         AnimatedNavigator.pushZoomIn(
           context,
-          MovieDetailScreen(movieId: movie.id!),
+          MovieDetailScreen(movieId: movie.id),
         );
         print("Navigating to detail for movie ID: ${movie.id}");
       },

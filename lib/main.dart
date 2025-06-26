@@ -10,9 +10,16 @@ import 'package:app_m0v4u/ui/splash_screen.dart';
 import 'package:app_m0v4u/ui/trailer_screen/providers/trailer_provider.dart';
 import 'package:app_m0v4u/ui/trailer_screen/providers/youtube_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:provider/provider.dart';
 
+import 'constants/constants.dart';
+import 'ui/chat_bot_screen/providers/chatbot_provider.dart';
+
 void main() {
+  Gemini.init(apiKey: geminiApiKey);
+
+
   runApp(
     MultiProvider(
       providers: [
@@ -26,6 +33,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => MoviesProvider()),
         ChangeNotifierProvider(create: (_) => ActorsProvider()),
         ChangeNotifierProvider(create: (_) => GenreMoviesProvider()),
+        ChangeNotifierProvider(create: (_) => ChatBotProvider()),
 
 
 

@@ -4,6 +4,8 @@ import 'package:app_m0v4u/shared/widgets/movie/movie_carousel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:share_plus/share_plus.dart';
+
 import '../providers/actor_provider.dart';
 import '../models/actor.dart';
 import '../../home_screen/models/movie_model.dart';
@@ -26,24 +28,21 @@ class _ActorScreenState extends State<ActorScreen> {
       create: (_) => ActorProvider()..loadActor(widget.actorId),
       child: Scaffold(
         appBar: const CustomNavBar(),
-
         backgroundColor: AppStyles.primaryColor,
         body: Consumer<ActorProvider>(
           builder: (context, provider, _) {
-
-            if (provider.isLoading){
-              return Center(child: const CircularProgressIndicator());
+            if (provider.isLoading) {
+              return const Center(child: CircularProgressIndicator());
             }
-         
 
             final Actor? actor = provider.actor;
             final List<Movie> movies = provider.movies.take(7).toList();
 
             if (actor == null) {
-              return const Center(child: Text('Acteur non trouvé'));
+              return const Center(child: Text('Actor not found'));
             }
 
-            final biography = actor.biography ?? 'Pas de biographie disponible.';
+            final biography = actor.biography ?? 'No biography available.';
             final isLongBio = biography.length > 300;
 
             return SingleChildScrollView(
@@ -76,19 +75,45 @@ class _ActorScreenState extends State<ActorScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
+
+                  /// SHARE BUTTON
                   Skeletonizer(
                     enabled: provider.isLoading,
                     child: Wrap(
                       alignment: WrapAlignment.center,
                       spacing: 12,
-                      children: const [
-                        Icon(Icons.alternate_email),
-                        Icon(Icons.camera_alt_outlined),
-                        Icon(Icons.share),
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.share, color: Colors.black),
+                          onPressed: () {
+                            final name = actor.name ?? 'Unknown Actor';
+                            final bio = actor.biography ?? 'No biography available.';
+                            final origin = actor.placeOfBirth ?? 'Unknown location';
+
+                            final message = '''
+                          Check out this actor: $name
+
+                          Origin: $origin
+                          Known for: ${actor.knownForDepartment ?? 'N/A'}
+                          Popular movies: ${movies.map((m) => m.title).join(', ')}
+                          
+                          Bio: $bio
+                          ''';
+                            final params=ShareParams(
+                              text: message.trim(),
+                              subject:'Discover $name',
+
+                            );
+
+                            SharePlus.instance.share(params);
+                          },
+                        ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 16),
+
+                  // Actor Info
                   Skeletonizer(
                     enabled: provider.isLoading,
                     child: Container(
@@ -101,20 +126,23 @@ class _ActorScreenState extends State<ActorScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildInfoRow('Célèbre pour', actor.knownForDepartment ?? 'N/A'),
-                          _buildInfoRow('Apparitions connues', movies.length.toString()),
-                          _buildInfoRow('Genre', actor.gender == 1 ? 'Femme' : 'Homme'),
-                          _buildInfoRow('Date de naissance', _formatDate(actor.birthday)),
-                          _buildInfoRow('Lieu de naissance', actor.placeOfBirth ?? 'N/A'),
+                          _buildInfoRow('Popular for', actor.knownForDepartment ?? 'N/A'),
+                          _buildInfoRow('Known appearances', movies.length.toString()),
+                          _buildInfoRow('Gender', actor.gender == 1 ? 'Female' : 'Male'),
+                          _buildInfoRow('Birth Date', _formatDate(actor.birthday)),
+                          _buildInfoRow('Origin', actor.placeOfBirth ?? 'N/A'),
                         ],
                       ),
                     ),
                   ),
+
                   const SizedBox(height: 16),
+
+                  // Biography
                   Skeletonizer(
                     enabled: provider.isLoading,
                     child: const Text(
-                      'Biographie',
+                      'Biography',
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 18,
@@ -138,16 +166,19 @@ class _ActorScreenState extends State<ActorScreen> {
                         setState(() => _isBioExpanded = !_isBioExpanded);
                       },
                       child: Text(
-                        _isBioExpanded ? 'Réduire' : 'Lire la suite',
+                        _isBioExpanded ? 'Less' : 'More',
                         style: const TextStyle(color: AppStyles.secondaryColor),
                       ),
                     ),
+
                   const SizedBox(height: 24),
+
+                  // Famous Movies
                   if (movies.isNotEmpty) ...[
                     const Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        'Célèbre pour',
+                        'Famous for',
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 18,
@@ -158,8 +189,9 @@ class _ActorScreenState extends State<ActorScreen> {
                     const SizedBox(height: 12),
                     Skeletonizer(
                       enabled: provider.isLoading,
-                      child: MovieCarousel(movies: movies)),
-                  ]
+                      child: MovieCarousel(movies: movies),
+                    ),
+                  ],
                 ],
               ),
             );
@@ -175,10 +207,16 @@ class _ActorScreenState extends State<ActorScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('$label: ',
-              style: const TextStyle(
-                  color: Colors.black87, fontWeight: FontWeight.bold)),
-          Expanded(child: Text(value, style: const TextStyle(color: Colors.black87))),
+          Text(
+            '$label: ',
+            style: const TextStyle(
+              color: Colors.black87,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Expanded(
+            child: Text(value, style: const TextStyle(color: Colors.black87)),
+          ),
         ],
       ),
     );

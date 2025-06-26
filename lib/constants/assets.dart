@@ -9,10 +9,12 @@ class Assets {
   static const welcomePic = 'assets/welcome_pic.jpg';
   static const pLusIcon = 'assets/voir-plus.png';
   static const homeAppbar = 'assets/appbar_home.png';
+  static const chatBotAppbar='assets/bot_app.png';
+
   static const playIcon = 'assets/playIcon.png';
   static const nextIcon = 'assets/next.png';
-  static const prevIcon = 'assets/back.png';
-  static const chatBot='assets/chatBot.png';
+  static const prevIcon = 'assets/precedent.png';
+  static const chatBot='assets/bot_bottom.png';
 
   static const actorsAppbar = 'assets/appbar_actors.png';
   static const moviesAppbar = 'assets/appbar_movies.png';

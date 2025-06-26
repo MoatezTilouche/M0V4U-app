@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:app_m0v4u/shared/widgets/appbar/custom_navbar.dart';
 import 'package:app_m0v4u/shared/widgets/appbar/menu_drawer.dart';
 import 'package:app_m0v4u/ui/movie_screen/providers/movie_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 class MovieDetailScreen extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -157,11 +158,29 @@ class MovieDetailScreen extends StatelessWidget {
                             const SizedBox(width: 12),
                             IconButton(
                               onPressed: () {},
-                              icon: const Icon(Icons.download,
-                                  color: AppStyles.secondaryColor),
+                              icon:  Image.asset(Assets.emptyLove,width: 30,height: 30,color: AppStyles.secondaryColor,)
+                                 ,
                             ),
                             IconButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                final message = '''
+                                🎬 Check out this movie: ${movie.title}
+                                
+                                🗓️ Release Date: ${movie.releaseDate?.year ?? 'Unknown'}
+                                ⭐ Rating: ${movie.voteAverage?.toString() ?? 'N/A'} / 10
+                                📄 Overview: ${movie.overview ?? 'No description available.'}
+                                
+                                Powered by M0V4U
+                                ''';
+
+                                final params = ShareParams(
+                                  text: message.trim(),
+                                  subject: 'Discover ${movie.title}',
+                                );
+
+                                SharePlus.instance.share(params);
+                              },
+
                               icon: const Icon(Icons.share,
                                   color: AppStyles.secondaryColor),
                             ),

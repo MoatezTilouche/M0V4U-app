@@ -1,11 +1,15 @@
 import 'package:app_m0v4u/constants/assets.dart';
 import 'package:app_m0v4u/constants/styles.dart';
+import 'package:app_m0v4u/shared/widgets/animations/animation_navigator.dart';
+import 'package:app_m0v4u/ui/chat_bot_screen/views/chat_bot_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'navbar_provider.dart';
 
 class CustomNavBar extends StatefulWidget implements PreferredSizeWidget {
-  const CustomNavBar({super.key});
+  final bool isBackButtonShown;
+
+  const CustomNavBar({super.key, this.isBackButtonShown = true});
 
   @override
   State<CustomNavBar> createState() => _CustomNavBarState();
@@ -28,36 +32,49 @@ class _CustomNavBarState extends State<CustomNavBar> {
     return Consumer<NavBarState>(
       builder: (context, navState, _) {
         return AppBar(
+          leadingWidth: !widget.isBackButtonShown ? 120 : 56,
           backgroundColor: AppStyles.secondaryColor,
-          leading: IconButton(
-            icon: Image.asset(
-              Assets.prevIcon,
-              height: 30.0,
-              width: 30.0,
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          title: navState.isSearchActive
-              ? TextField(
-                  autofocus: true,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    hintText: 'Search...',
-                    hintStyle: TextStyle(color: Colors.white70),
-                    border: InputBorder.none,
+          leading: widget.isBackButtonShown
+              ? IconButton(
+                  icon: Image.asset(
+                    Assets.prevIcon,
+                    height: 35.0,
+                    width: 35.0,
                   ),
-                  onChanged: (value) => navState.setSearchQuery(value),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
                 )
+              : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset(
+                    Assets.appLogoIcon,
+                    height: 35.0,
+                    width: 35.0,
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'M0V4U',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+                  ),
+                ],
+              ),
+          title: !widget.isBackButtonShown
+              ? SizedBox.shrink()
               : Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Image.asset(
                       Assets.appLogoIcon,
-                      height: 24.0,
-                      width: 24.0,
+                      height: 35.0,
+                      width: 35.0,
                     ),
                     const SizedBox(width: 8),
                     const Text(
@@ -73,15 +90,12 @@ class _CustomNavBarState extends State<CustomNavBar> {
           actions: [
             IconButton(
               icon: Image.asset(
-                navState.isSearchActive ? Assets.closeIcon : Assets.searchIcon,
-                height: 26.0,
-                width: 26.0,
+                Assets.chatBotAppbar,
+                height: 35.0,
+                width: 35.0,
               ),
               onPressed: () {
-                if (navState.isSearchActive) {
-                  navState.setSearchQuery('');
-                }
-                navState.toggleSearch();
+                AnimatedNavigator.pushZoomIn(context, ChatBotScreen());
               },
             ),
             IconButton(

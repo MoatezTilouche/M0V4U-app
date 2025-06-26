@@ -1,6 +1,4 @@
 import 'package:app_m0v4u/constants/styles.dart';
-import 'package:app_m0v4u/shared/widgets/appbar/custom_navbar.dart';
-import 'package:app_m0v4u/shared/widgets/appbar/menu_drawer.dart';
 import 'package:app_m0v4u/shared/widgets/movie/movie_carousel.dart';
 import 'package:app_m0v4u/ui/actor_screen/views/actors_screen.dart';
 import 'package:app_m0v4u/ui/genre_screen/views/genre_screen.dart';
@@ -13,12 +11,9 @@ import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../constants/assets.dart';
 import '../../../shared/widgets/animations/animation_navigator.dart';
-import '../../../shared/widgets/bottomBar/bottom_bar.dart';
 import '../../movies/movies_screen/movies_screen.dart';
 
 class HomeScreen extends StatelessWidget {
-  // Define the GlobalKey here instead of passing it as a const
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   HomeScreen({super.key});
 
@@ -33,10 +28,10 @@ class HomeScreen extends StatelessWidget {
           home_provider.fetchPopularActors();
         }
 
-        return Scaffold(
-          key: _scaffoldKey, // Use the scaffold key here
-          backgroundColor: AppStyles.primaryColor,
-          body: SingleChildScrollView(
+        return SizedBox(
+          height: MediaQuery.of(context).size.height,
+          width: double.infinity,
+          child:  SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(0.0),
               child: Column(
@@ -80,15 +75,15 @@ class HomeScreen extends StatelessWidget {
                   // Trending Movies List
                   home_provider.popularMovies.isNotEmpty
                       ? Skeletonizer(
-                          enabled: home_provider.isLoading,
-                          child: MovieCarousel(movies: home_provider.popularMovies.take(10).toList()),
-                        )
+                    enabled: home_provider.isLoading,
+                    child: MovieCarousel(movies: home_provider.popularMovies.take(10).toList()),
+                  )
                       : const Center(
-                          child: Text(
-                            'Aucun film tendance trouvé',
-                            style: TextStyle(color: Colors.white70),
-                          ),
-                        ),
+                    child: Text(
+                      'Aucun film tendance trouvé',
+                      style: TextStyle(color: Colors.white70),
+                    ),
+                  ),
                   const SizedBox(height: 20),
                   Skeletonizer(
                     enabled: home_provider.isLoading,
@@ -139,15 +134,15 @@ class HomeScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   home_provider.popularActors.isNotEmpty
                       ? Skeletonizer(
-                          enabled: home_provider.isLoading,
-                          child: ActorHomeCarousel(actors: home_provider.popularActors.take(7).toList()),
-                        )
+                    enabled: home_provider.isLoading,
+                    child: ActorHomeCarousel(actors: home_provider.popularActors.take(7).toList()),
+                  )
                       : const Center(
-                          child: Text(
-                            'Aucun acteur populaire trouvé',
-                            style: TextStyle(color: Colors.white70),
-                          ),
-                        ),
+                    child: Text(
+                      'Aucun acteur populaire trouvé',
+                      style: TextStyle(color: Colors.white70),
+                    ),
+                  ),
                   const SizedBox(height: 8),
                   Skeletonizer(
                     enabled: home_provider.isLoading,

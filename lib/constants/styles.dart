@@ -29,4 +29,10 @@ class AppStyles {
   );
 
   static const String fontFamily = 'Roboto';
+
+  static const Color userBubbleColor = Color(0xFF1E88E5); // Blue for user messages
+  static const Color botBubbleColor = Color(0xFFE0E0E0); // Light grey for bot messages
+  static const Color userTextColor = Colors.white;
+  static const Color botTextColor = Colors.black87;
+  static const Color sendButtonColor = Color(0xFF1E88E5);
 }
