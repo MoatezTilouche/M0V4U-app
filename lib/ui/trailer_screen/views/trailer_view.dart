@@ -148,6 +148,7 @@ class TrailerSelectorWidget extends StatelessWidget {
                   ),
                 ),
               ),
+
             ],
           ),
         );

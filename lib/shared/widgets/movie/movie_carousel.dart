@@ -2,7 +2,11 @@ import 'package:app_m0v4u/constants/styles.dart';
 import 'package:app_m0v4u/shared/widgets/movie/movie_card.dart';
 import 'package:app_m0v4u/ui/home_screen/models/movie_model.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:app_m0v4u/ui/auth/providers/auth_provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+
+import '../../../ui/movie_screen/providers/favorites_provider.dart';
 
 class MovieCarousel extends StatefulWidget {
   final List<Movie> movies;
@@ -20,12 +24,23 @@ class _MovieCarouselState extends State<MovieCarousel> {
   @override
   void initState() {
     super.initState();
+    // Fetch favorites if user is logged in
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+    if (auth.isLoggedIn) {
+      Provider.of<FavoriteProvider>(context, listen: false).fetchFavorites(auth);
+    }
     _controller.addListener(() {
       final page = _controller.page?.round() ?? 0;
       if (page != _currentPage) {
         setState(() => _currentPage = page);
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override

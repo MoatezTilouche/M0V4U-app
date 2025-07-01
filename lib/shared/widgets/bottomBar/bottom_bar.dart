@@ -96,8 +96,9 @@ class AppBottomBarState extends State<AppBottomBar> with SingleTickerProviderSta
                             end: Alignment.bottomCenter,
                             colors: _selectedIndex == index
                                 ? [
-                                    AppStyles.primaryColor,
-                                    AppStyles.secondaryColor,
+
+                              Color(0xFF4CAF50),
+                              Color(0xFF2196F3),
                                   ]
                                 : [
                                     Colors.transparent,

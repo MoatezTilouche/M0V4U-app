@@ -57,15 +57,7 @@ class HomeScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 90),
-                          TextButton(
-                            onPressed: () {
-                              AnimatedNavigator.pushZoomIn(context, MoviesScreen());
-                            },
-                            child: Text(
-                              "View More",
-                              style: TextStyle(color: AppStyles.darkColor),
-                            ),
-                          )
+
                         ],
                       ),
                     ),
@@ -117,15 +109,7 @@ class HomeScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 90),
-                          TextButton(
-                            onPressed: () {
-                              AnimatedNavigator.pushZoomIn(context, ActorsScreen());
-                            },
-                            child: Text(
-                              "View More",
-                              style: TextStyle(color: AppStyles.darkColor),
-                            ),
-                          )
+
                         ],
                       ),
                     ),
@@ -149,6 +133,7 @@ class HomeScreen extends StatelessWidget {
                     child: TrailerSelectorWidget(),
                   ),
                 ],
+
               ),
             ),
           ),

@@ -2,24 +2,25 @@ import 'package:app_m0v4u/constants/styles.dart';
 import 'package:app_m0v4u/shared/widgets/animations/animation_navigator.dart';
 import 'package:app_m0v4u/ui/home_screen/models/movie_model.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:app_m0v4u/constants/assets.dart';
-import 'package:app_m0v4u/ui/movie_screen/view/movie_screen.dart';
+
+import '../../../ui/auth/providers/auth_provider.dart';
+import '../../../ui/movie_screen/providers/favorites_provider.dart';
+import '../../../ui/movie_screen/view/movie_screen.dart';
 
 class MovieCard extends StatelessWidget {
   final Movie movie;
-  final bool selectedLove;
-  final VoidCallback? onFavoriteTap;
 
   const MovieCard({
     super.key,
     required this.movie,
-    this.selectedLove = false,
-    this.onFavoriteTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    print('Genres for ${movie.title}: ${movie.genres}');
+    final favoriteProvider = Provider.of<FavoriteProvider>(context);
+    final isFavorite = favoriteProvider.favorites.any((fav) => fav['id'] == movie.id);
 
     return GestureDetector(
       onTap: () {
@@ -45,15 +46,60 @@ class MovieCard extends StatelessWidget {
                 height: 260,
                 width: 230,
                 fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => const Icon(
+                  Icons.movie,
+                  color: Colors.white70,
+                  size: 50,
+                ),
               ),
             ),
             Positioned(
               top: 10,
               right: 10,
               child: GestureDetector(
-                onTap: onFavoriteTap,
+                onTap: () async {
+                  final auth = Provider.of<AuthProvider>(context, listen: false);
+                  if (auth.isLoggedIn) {
+                    await favoriteProvider.toggleFavorite(
+                      auth: auth,
+                      movieId: movie.id,
+                      add: !isFavorite,
+                    );
+                    if (favoriteProvider.error != null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(favoriteProvider.error!),
+                          backgroundColor: Colors.redAccent,
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            isFavorite ? 'Removed from favorites' : 'Added to favorites',
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          backgroundColor: AppStyles.secondaryColor,
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                      );
+                    }
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text('Please log in to add to favorites'),
+                        backgroundColor: Colors.redAccent,
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                    );
+                  }
+                },
                 child: Image.asset(
-                  selectedLove ? Assets.fullLove : Assets.emptyLove,
+                  isFavorite ? Assets.fullLove : Assets.emptyLove,
                   height: 24,
                   width: 24,
                 ),
@@ -74,8 +120,7 @@ class MovieCard extends StatelessWidget {
                     begin: Alignment.bottomCenter,
                     end: Alignment.topCenter,
                   ),
-                  borderRadius:
-                      BorderRadius.vertical(bottom: Radius.circular(16)),
+                  borderRadius: BorderRadius.vertical(bottom: Radius.circular(16)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -111,13 +156,12 @@ class MovieCard extends StatelessWidget {
                         spacing: 6,
                         children: movie.genres.take(2).map((genre) {
                           return Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
                                 colors: [
-                                  Color(0xFF2196F3), // Bleu (haut)
-                                  Color(0xFF4CAF50), // Vert (bas)
+                                  Color(0xFF2196F3),
+                                  Color(0xFF4CAF50),
                                 ],
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
