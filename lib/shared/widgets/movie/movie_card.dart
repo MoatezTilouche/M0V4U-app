@@ -2,32 +2,26 @@ import 'package:app_m0v4u/constants/styles.dart';
 import 'package:app_m0v4u/shared/widgets/animations/animation_navigator.dart';
 import 'package:app_m0v4u/ui/home_screen/models/movie_model.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:app_m0v4u/constants/assets.dart';
-import 'package:app_m0v4u/ui/movie_screen/view/movie_screen.dart';
+
+import '../../../ui/auth/providers/auth_provider.dart';
+import '../../../ui/movie_screen/providers/favorites_provider.dart';
+import '../../../ui/movie_screen/view/movie_screen.dart';
 
 class MovieCard extends StatelessWidget {
   final Movie movie;
-  final bool selectedLove;
-  final VoidCallback? onFavoriteTap;
 
-  const MovieCard({
-    super.key,
-    required this.movie,
-    this.selectedLove = false,
-    this.onFavoriteTap,
-  });
+  const MovieCard({super.key, required this.movie});
 
   @override
   Widget build(BuildContext context) {
-    print('Genres for ${movie.title}: ${movie.genres}');
-
     return GestureDetector(
       onTap: () {
         AnimatedNavigator.pushZoomIn(
           context,
           MovieDetailScreen(movieId: movie.id),
         );
-        print("Navigating to detail for movie ID: ${movie.id}");
       },
       child: Container(
         width: 180,
@@ -45,20 +39,65 @@ class MovieCard extends StatelessWidget {
                 height: 260,
                 width: 230,
                 fit: BoxFit.cover,
-              ),
-            ),
-            Positioned(
-              top: 10,
-              right: 10,
-              child: GestureDetector(
-                onTap: onFavoriteTap,
-                child: Image.asset(
-                  selectedLove ? Assets.fullLove : Assets.emptyLove,
-                  height: 24,
-                  width: 24,
+                errorBuilder: (context, error, stackTrace) => const Icon(
+                  Icons.movie,
+                  color: Colors.white70,
+                  size: 50,
                 ),
               ),
             ),
+            // Favorite icon with Consumer
+            Positioned(
+              top: 10,
+              right: 10,
+              child: Consumer<FavoriteProvider>(
+                builder: (context, favoriteProvider, _) {
+                  final isFavorite = favoriteProvider.isInFavorites(movie.id);
+                  return GestureDetector(
+                    onTap: () async {
+                      final auth = Provider.of<AuthProvider>(context, listen: false);
+                      if (!auth.isLoggedIn) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Please log in to add to favorites"),
+                            backgroundColor: Colors.redAccent,
+                          ),
+                        );
+                        return;
+                      }
+                      try {
+                        await favoriteProvider.toggleFavorite(
+                          auth: auth,
+                          movieId: movie.id,
+                          add: !isFavorite,
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              isFavorite ? 'Removed from favorites' : 'Added to favorites',
+                            ),
+                            backgroundColor: AppStyles.secondaryColor,
+                          ),
+                        );
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Error: $e"),
+                            backgroundColor: Colors.redAccent,
+                          ),
+                        );
+                      }
+                    },
+                    child: Image.asset(
+                      isFavorite ? Assets.fullLove : Assets.emptyLove,
+                      height: 24,
+                      width: 24,
+                    ),
+                  );
+                },
+              ),
+            ),
+            // Info at the bottom
             Positioned(
               bottom: 0,
               left: 0,
@@ -67,15 +106,11 @@ class MovieCard extends StatelessWidget {
                 padding: const EdgeInsets.all(8),
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [
-                      Colors.black,
-                      AppStyles.secondaryColor,
-                    ],
+                    colors: [Colors.black, AppStyles.secondaryColor],
                     begin: Alignment.bottomCenter,
                     end: Alignment.topCenter,
                   ),
-                  borderRadius:
-                      BorderRadius.vertical(bottom: Radius.circular(16)),
+                  borderRadius: BorderRadius.vertical(bottom: Radius.circular(16)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,10 +131,7 @@ class MovieCard extends StatelessWidget {
                         const SizedBox(width: 4),
                         Text(
                           movie.voteAverage.toStringAsFixed(1),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 13,
-                          ),
+                          style: const TextStyle(color: Colors.white, fontSize: 13),
                         ),
                         const SizedBox(width: 2),
                         const Icon(Icons.star, color: Colors.amber, size: 16),
@@ -111,14 +143,10 @@ class MovieCard extends StatelessWidget {
                         spacing: 6,
                         children: movie.genres.take(2).map((genre) {
                           return Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
-                                colors: [
-                                  Color(0xFF2196F3), // Bleu (haut)
-                                  Color(0xFF4CAF50), // Vert (bas)
-                                ],
+                                colors: [Color(0xFF2196F3), Color(0xFF4CAF50)],
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
                               ),

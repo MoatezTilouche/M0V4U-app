@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
 class AnimatedRoute {
-  static PageRouteBuilder fade(Widget page) {
+  static PageRouteBuilder fade(Widget page, {String? routeName}) {
     return PageRouteBuilder(
+      settings: RouteSettings(name: routeName),
+
       transitionDuration: const Duration(milliseconds: 600),
       pageBuilder: (_, __, ___) => page,
       transitionsBuilder: (_, animation, __, child) {
@@ -14,8 +16,10 @@ class AnimatedRoute {
     );
   }
 
-  static PageRouteBuilder slideFromBottom(Widget page) {
+  static PageRouteBuilder slideFromBottom(Widget page, {String? routeName}) {
     return PageRouteBuilder(
+      settings: RouteSettings(name: routeName),
+
       transitionDuration: const Duration(milliseconds: 600),
       pageBuilder: (_, __, ___) => page,
       transitionsBuilder: (_, animation, __, child) {

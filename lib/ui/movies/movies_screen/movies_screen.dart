@@ -26,6 +26,7 @@ class MoviesScreen extends StatefulWidget {
 class _MoviesScreenState extends State<MoviesScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late ScrollController _scrollController;
+  late TextEditingController _textEditingController;
   String searchQuery = '';
   Timer? _debounce;
 
@@ -35,10 +36,12 @@ class _MoviesScreenState extends State<MoviesScreen> with SingleTickerProviderSt
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
     _scrollController = ScrollController();
+    _textEditingController=TextEditingController();
 
-    // Initialize first tab
-    Provider.of<MoviesProvider>(context, listen: false).fetchPopularMovies();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<MoviesProvider>(context, listen: false).fetchPopularMovies();
 
+    });
     _tabController.addListener(_onTabChanged);
     _scrollController.addListener(_onScroll);
   }
@@ -124,7 +127,7 @@ class _MoviesScreenState extends State<MoviesScreen> with SingleTickerProviderSt
             child: Padding(
               padding: const EdgeInsets.all(10.0),
               child: TextField(
-                controller: TextEditingController(text: searchQuery), // Set the initial text
+                controller: _textEditingController, // Set the initial text
                 decoration: InputDecoration(
                   hintText: 'Search movies...',
                   filled: true,
@@ -146,7 +149,8 @@ class _MoviesScreenState extends State<MoviesScreen> with SingleTickerProviderSt
                     ),
                     onPressed: () {
                       setState(() {
-                        searchQuery = ''; // Clear the search query
+                        _textEditingController.clear();
+                        searchQuery='';// Clear the search query
                       });
                       // You can also call the searchMovies method with an empty query if needed
                       Provider.of<MoviesProvider>(context, listen: false).searchMovies('');
@@ -167,34 +171,21 @@ class _MoviesScreenState extends State<MoviesScreen> with SingleTickerProviderSt
               unselectedLabelColor: Colors.white.withOpacity(0.6),
               tabs: [
                 Tab(
-                  child: AutoSizeText(
-                    'Popular',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                    maxLines: 1,
-                  ),
+                  child: _buildTapBarText('Popular')
+
+          ),
+                Tab(
+                  child:_buildTapBarText('Upcoming')
+
+    ),
+                Tab(
+                  child: _buildTapBarText('Top Rated')
                 ),
                 Tab(
-                  child: AutoSizeText(
-                    'Upcoming',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                    maxLines: 1,
-                  ),
-                ),
-                Tab(
-                  child: AutoSizeText(
-                    'Top Rated',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                    maxLines: 1,
-                  ),
-                ),
-                Tab(
-                  child: AutoSizeText(
-                    'Now Playing',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                    maxLines: 2,
-                  ),
-                ),
-              ],
+                   child: _buildTapBarText('Now Playing')
+                )
+
+    ],
             ),
           ),
           // Displaying either Search Results or Movies
@@ -229,92 +220,123 @@ class _MoviesScreenState extends State<MoviesScreen> with SingleTickerProviderSt
                 }
               }
 
-              return Skeletonizer(
-                enabled: provider.isLoading && moviesToDisplay.isEmpty,
-                child: GridView.builder(
-                  controller: _scrollController,
-                  padding: EdgeInsets.all(8.0),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 10.0,
-                    mainAxisSpacing: 20.0,
-                    childAspectRatio: 1 / 1.3,
-                  ),
-                  itemCount: moviesToDisplay.length + (hasMorePages && provider.isLoading ? 2 : 0),
-                  itemBuilder: (context, index) {
-                    if (index >= moviesToDisplay.length) {
+              if (moviesToDisplay.isEmpty){
+                return Center(
+                    child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children :[
+                    Icon(Icons.search_off,color: AppStyles.secondaryColor,size: 50,) ,
+                    SizedBox(height: 25,),
+                    Text('No Movies To display',style: TextStyle(
+                    color: AppStyles.darkColor,
+                    fontSize: 20
+                    ),)
+
+                    ]),
+                    );
+                    }
+             else {
+                return Skeletonizer(
+                  enabled: provider.isLoading ,
+                  child: GridView.builder(
+                    controller: _scrollController,
+                    padding: EdgeInsets.all(8.0),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 10.0,
+                      mainAxisSpacing: 20.0,
+                      childAspectRatio: 1 / 1.3,
+                    ),
+                    itemCount: moviesToDisplay.length +
+                        (hasMorePages && provider.isLoading ? 2 : 0),
+                    itemBuilder: (context, index) {
+                      if (index >= moviesToDisplay.length) {
+                        return Card(
+                          color: AppStyles.cardColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          elevation: 4,
+                        );
+                      }
+                      final movie = moviesToDisplay[index];
                       return Card(
                         color: AppStyles.cardColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
                         elevation: 4,
-                      );
-                    }
-                    final movie = moviesToDisplay[index];
-                    return Card(
-                      color: AppStyles.cardColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 4,
-                      child: GestureDetector(
-                        onTap: () {
-                          AnimatedNavigator.pushZoomIn(context, MovieDetailScreen(movieId: movie.id!));
-                        },
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(16),
-                                topRight: Radius.circular(16),
+                        child: GestureDetector(
+                          onTap: () {
+                            AnimatedNavigator.pushZoomIn(
+                                context, MovieDetailScreen(movieId: movie.id!));
+                          },
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(16),
+                                  topRight: Radius.circular(16),
+                                ),
+                                child: Image.network(
+                                  'https://image.tmdb.org/t/p/w500${movie
+                                      .posterPath}',
+                                  width: double.infinity,
+                                  height: 160,
+                                  fit: BoxFit.fill,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      width: double.infinity,
+                                      height: 160,
+                                      color: Colors.grey[300],
+                                      child: Icon(Icons.movie_filter, size: 50,
+                                          color: Colors.grey[600]),
+                                    );
+                                  },
+                                ),
                               ),
-                              child: Image.network(
-                                'https://image.tmdb.org/t/p/w500${movie.posterPath}',
-                                width: double.infinity,
-                                height: 160,
-                                fit: BoxFit.fill,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Container(
-                                    width: double.infinity,
-                                    height: 160,
-                                    color: Colors.grey[300],
-                                    child: Icon(Icons.movie_filter, size: 50, color: Colors.grey[600]),
-                                  );
-                                },
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: SizedBox(
-                                width: double.infinity,
-                                height: 35,
-                                child: Center(
-                                  child: AutoSizeText(
-                                    maxLines: 2,
-                                    movie.title ?? "Unknown Title",
-                                    textAlign: TextAlign.center,
-                                    minFontSize: 8,
-                                    maxFontSize: 12,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
+                              Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: SizedBox(
+                                  width: double.infinity,
+                                  height: 35,
+                                  child: Center(
+                                    child: AutoSizeText(
+                                      maxLines: 2,
+                                      movie.title ?? "Unknown Title",
+                                      textAlign: TextAlign.center,
+                                      minFontSize: 8,
+                                      maxFontSize: 12,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                ),
-              );
+                      );
+                    },
+                  ),
+                );
+              }
             }),
           ),
         ],
       ),
     );
   }
+
+Widget _buildTapBarText(String text) {
+    return AutoSizeText(
+      text,
+      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+      maxLines: 1,
+      minFontSize: 10,
+      maxFontSize: 12,
+    );
+}
 }

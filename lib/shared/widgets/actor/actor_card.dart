@@ -2,6 +2,7 @@ import 'package:app_m0v4u/constants/styles.dart';
 import 'package:app_m0v4u/shared/widgets/animations/animation_navigator.dart';
 import 'package:app_m0v4u/ui/actor/view/actor_screen.dart';
 import 'package:app_m0v4u/ui/movie_screen/models/movie.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 
 class ActorCard extends StatelessWidget {
@@ -47,20 +48,25 @@ class ActorCard extends StatelessWidget {
             const SizedBox(width: 6),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                padding: const EdgeInsets.symmetric(vertical: 5.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(actor.name,
+                    AutoSizeText(actor.name,
                         style: const TextStyle(
                             color: Colors.white,
                             fontSize: 12,
                             fontWeight: FontWeight.bold),
-                        overflow: TextOverflow.ellipsis),
-                    Text(actor.character,
-                        style: const TextStyle(color: Colors.white70, fontSize: 11),
-                        overflow: TextOverflow.ellipsis),
+                        overflow: TextOverflow.ellipsis,
+
+                    maxFontSize: 12,
+                      maxLines: 2,
+                    ),
+                    AutoSizeText(actor.character,
+                        style: const TextStyle(color: Colors.white70, fontSize: 8),
+                        overflow: TextOverflow.ellipsis,
+                    maxLines: 2,),
                   ],
                 ),
               ),

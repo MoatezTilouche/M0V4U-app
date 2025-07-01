@@ -2,3 +2,5 @@ const apiKey = 'e7e9d3be2fd4de2754fb8700716a4c82';
 const String baseUrl = 'https://api.themoviedb.org/3';
 
 const String geminiApiKey='AIzaSyBceJ_leRkVEHy8d35GPrY5LpmbC4BHdC0';
+
+const String accessToken="eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJlN2U5ZDNiZTJmZDRkZTI3NTRmYjg3MDA3MTZhNGM4MiIsIm5iZiI6MTc0OTYzNTk3MC45NzEsInN1YiI6IjY4NDk1MzgyYmJmZTMxY2M5MDI5MzhiZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.biVz_8wwX651-4AkGiDxyLA4G1hlA1qW4tZmGTlzKSA";

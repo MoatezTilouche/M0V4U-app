@@ -13,7 +13,13 @@ class GenreGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<GenreScreenProvider>(builder: (context, genreProvider, _) {
       if (genreProvider.genres.isEmpty) {
-        genreProvider.fetchGenres();
+
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+
+            genreProvider.fetchGenres();
+
+          });
+
       }
 
       return Skeletonizer(

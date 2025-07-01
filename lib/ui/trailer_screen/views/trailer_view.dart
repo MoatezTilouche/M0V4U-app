@@ -22,7 +22,12 @@ class TrailerSelectorWidget extends StatelessWidget {
     return Consumer<TrailerProvider>(
       builder: (context, trailerProvider, _) {
         if (trailerProvider.trailers.isEmpty) {
-          trailerProvider.loadTrailers("popular");
+
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            trailerProvider.loadTrailers("popular");
+
+          });
+
         }
         return Container(
           decoration: const BoxDecoration(color: AppStyles.secondaryColor),
@@ -148,6 +153,7 @@ class TrailerSelectorWidget extends StatelessWidget {
                   ),
                 ),
               ),
+
             ],
           ),
         );

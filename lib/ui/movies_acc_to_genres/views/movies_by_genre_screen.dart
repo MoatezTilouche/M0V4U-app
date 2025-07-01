@@ -11,14 +11,19 @@ import '../../genre_screen/model/genre_model.dart';
 import '../../genre_screen/providers/genre_provider.dart';
 import '../providers/movies_by_genre_provider.dart';
 
+
 class GenreMoviesScreen extends StatefulWidget {
   final int genreId;
   final String genreName;
 
-  const GenreMoviesScreen({super.key, required this.genreId, required this.genreName});
+  const GenreMoviesScreen({
+    super.key,
+    required this.genreId,
+    required this.genreName,
+  });
 
   @override
-  _GenreMoviesScreenState createState() => _GenreMoviesScreenState();
+  State<GenreMoviesScreen> createState() => _GenreMoviesScreenState();
 }
 
 class _GenreMoviesScreenState extends State<GenreMoviesScreen> {
@@ -28,8 +33,12 @@ class _GenreMoviesScreenState extends State<GenreMoviesScreen> {
   void initState() {
     super.initState();
     _scrollController = ScrollController();
-    // Fetch movies by genre initially
-    Provider.of<GenreMoviesProvider>(context, listen: false).fetchMoviesByGenre(widget.genreId);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<GenreMoviesProvider>().fetchMoviesByGenre(widget.genreId);
+    });
+
+    _scrollController.addListener(_onScroll);
   }
 
   @override
@@ -38,199 +47,176 @@ class _GenreMoviesScreenState extends State<GenreMoviesScreen> {
     super.dispose();
   }
 
+  void _onScroll() {
+    final provider = context.read<GenreMoviesProvider>();
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200 &&
+        !provider.isLoading &&
+        provider.hasMorePages) {
+      provider.fetchMoviesByGenre(widget.genreId);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppStyles.primaryColor,
-      appBar: CustomNavBar(),
-      body: Consumer<GenreMoviesProvider>(builder: (context, provider, _) {
-        // Check if the provider has any movies and display loading skeleton if needed
-        if (provider.genreMovies.isEmpty && !provider.isLoading) {
-          return Center(child: Text("No movies found for this genre"));
-        }
+      appBar: const CustomNavBar(),
+      body: Consumer<GenreMoviesProvider>(
+        builder: (context, provider, _) {
+          if (provider.genreMovies.isEmpty && !provider.isLoading) {
+            return const Center(child: Text("No movies found for this genre", style: TextStyle(color: Colors.white70)));
+          }
 
-        List<Result> moviesToDisplay = provider.genreMovies;
-        bool hasMorePages = provider.hasMorePagesForGenre();
+          final moviesToDisplay = provider.genreMovies;
+          final hasMorePages = provider.hasMorePagesForGenre();
 
-        return Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: const Text(
-                'Browse Topics',
-                style: TextStyle(
-                  color: AppStyles.textColor,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(8),
+                child: Center(
+                  child: Text(
+                    'Browse Topics',
+                    style: TextStyle(
+                      color: AppStyles.textColor,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
-            ),
-            // Genre Grid for selection
-            _buildGenreGrid(),
-            const SizedBox(height: 3),
-            Expanded(  // Wrap GridView with Expanded
-              child: GridView.builder(
-                controller: _scrollController,
-                padding: const EdgeInsets.all(8.0),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 10.0,
-                  mainAxisSpacing: 20.0,
-                  childAspectRatio: 1 / 1.3,
-                ),
-                itemCount: moviesToDisplay.length + (hasMorePages && provider.isLoading ? 2 : 0),
-                itemBuilder: (context, index) {
-                  if (index >= moviesToDisplay.length) {
-                    return Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 4,
-                    );
-                  }
-
-                  final movie = moviesToDisplay[index];
-                  return Card(
-                    color: AppStyles.cardColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+              _buildGenreGrid(),
+              const SizedBox(height: 4),
+              Expanded(
+                child: Skeletonizer(
+                  enabled: provider.isLoading && moviesToDisplay.isEmpty,
+                  child: GridView.builder(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.all(8),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 20,
+                      childAspectRatio: 1 / 1.3,
                     ),
-                    elevation: 4,
-                    child: GestureDetector(
-                      onTap: () {
-                        AnimatedNavigator.pushZoomIn(
-                            context, MovieDetailScreen(movieId: movie.id!));
-                      },
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(16),
-                              topRight: Radius.circular(16),
-                            ),
-                            child: Image.network(
-                              'https://image.tmdb.org/t/p/w500${movie.posterPath}',
-                              width: double.infinity,
-                              height: 160,
-                              fit: BoxFit.fill,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
-                                  width: double.infinity,
+                    itemCount: moviesToDisplay.length + (hasMorePages && provider.isLoading ? 2 : 0),
+                    itemBuilder: (context, index) {
+                      if (index >= moviesToDisplay.length) {
+                        return Card(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          elevation: 4,
+                        );
+                      }
+                      final movie = moviesToDisplay[index];
+                      return GestureDetector(
+                        onTap: () {
+                          AnimatedNavigator.pushZoomIn(
+                            context,
+                            MovieDetailScreen(movieId: movie.id!),
+                          );
+                        },
+                        child: Card(
+                          color: AppStyles.cardColor,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          elevation: 4,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ClipRRect(
+                                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                                child: Image.network(
+                                  'https://image.tmdb.org/t/p/w500${movie.posterPath}',
                                   height: 160,
-                                  color: Colors.grey[300],
-                                  child: Icon(Icons.movie_filter, size: 50, color: Colors.grey[600]),
-                                );
-                              },
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(2.0),
-                            child: SizedBox(
-                              width: double.infinity,
-                              height: 35,
-                              child: Center(
-                                child: Text(
-                                  movie.title ?? "Unknown Title",
-                                  textAlign: TextAlign.center,
-                                  maxLines: 2,
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => const Icon(Icons.movie, size: 50, color: Colors.white70),
                                 ),
                               ),
-                            ),
+                              Padding(
+                                padding: const EdgeInsets.all(4.0),
+                                child: SizedBox(
+                                  height: 35,
+                                  child: Center(
+                                    child: Text(
+                                      movie.title ?? "Unknown Title",
+                                      textAlign: TextAlign.center,
+                                      maxLines: 2,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ),
-            ),
-          ],
-        );
-      }),
+            ],
+          );
+        },
+      ),
     );
   }
 
-  // Create Genre Grid inside GenreMoviesScreen
   Widget _buildGenreGrid() {
     return Consumer<GenreScreenProvider>(builder: (context, genreProvider, _) {
-      if (genreProvider.genres.isEmpty) {
-        genreProvider.fetchGenres();
+      if (genreProvider.genres.isEmpty && !genreProvider.isLoading) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          genreProvider.fetchGenres();
+        });
       }
 
       return Skeletonizer(
         enabled: genreProvider.isLoading,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildGenreGridItems(genreProvider.genres),
-            const SizedBox(height: 10),
-          ],
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.all(8),
+          child: Row(
+            children: genreProvider.genres.map((genre) {
+              return _buildGenreItem(genre.id!, genre.name!, genre.icon!);
+            }).toList(),
+          ),
         ),
       );
     });
   }
 
-  // Build genre grid items (each genre)
-  Widget _buildGenreGridItems(List<Genre> genres) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 8),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: genres.map((genre) {
-                return _buildGenreItem(genre.id!, genre.name!, genre.icon!);
-              }).toList(),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Genre item for each genre
   Widget _buildGenreItem(int genreId, String genreName, String genreIcon) {
     return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
+      padding: const EdgeInsets.only(right: 8),
       child: GestureDetector(
         onTap: () {
-          // Change the genreId and genreName dynamically and fetch movies
-          Provider.of<GenreMoviesProvider>(context, listen: false).resetGenreMovies(genreId);
-          Provider.of<GenreMoviesProvider>(context, listen: false)
-              .fetchMoviesByGenre(genreId);
+          final provider = context.read<GenreMoviesProvider>();
+          provider.resetGenreMovies(genreId);
+          provider.fetchMoviesByGenre(genreId);
         },
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(12.0),
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(20.0),
-              ),
               width: 90,
               height: 90,
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(20),
+              ),
+              padding: const EdgeInsets.all(8),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Image.asset(
-                    genreIcon,
-                    height: 25.0,
-                    width: 25.0,
-                  ),
+                  Image.asset(genreIcon, height: 25, width: 25),
                   const SizedBox(height: 5),
                   Text(
                     genreName,
-                    style: const TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w500,
-                    ),
+                    style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -242,3 +228,11 @@ class _GenreMoviesScreenState extends State<GenreMoviesScreen> {
     );
   }
 }
+
+
+  // Create Genre Grid inside GenreMoviesScreen
+
+  // Build genre grid items (each genre)
+
+  // Genre item for each genre
+

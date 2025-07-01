@@ -15,69 +15,48 @@ import '../../actor/models/actor.dart';
 import '../providers/actor_screen_provider.dart';
 
 class ActorsScreen extends StatefulWidget {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  const ActorsScreen({super.key});
 
   @override
-  _ActorsScreenState createState() => _ActorsScreenState();
+  State<ActorsScreen> createState() => _ActorsScreenState();
 }
 
-class _ActorsScreenState extends State<ActorsScreen> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _ActorsScreenState extends State<ActorsScreen> {
   late ScrollController _scrollController;
+  late TextEditingController _textEditingController;
   String searchQuery = '';
   Timer? _debounce;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
     _scrollController = ScrollController();
+    _textEditingController = TextEditingController();
 
-    // Fetch popular actors initially
-    Provider.of<ActorsProvider>(context, listen: false).fetchPopularActors();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<ActorsProvider>(context, listen: false).fetchPopularActors();
+    });
 
-    _tabController.addListener(_onTabChanged);
     _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
     _debounce?.cancel();
-    _tabController.removeListener(_onTabChanged);
-    _tabController.dispose();
-    _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
+    _textEditingController.dispose();
     super.dispose();
   }
 
-  void _onTabChanged() {
-    if (!_tabController.indexIsChanging) {
-      final provider = Provider.of<ActorsProvider>(context, listen: false);
-      provider.resetActors(_tabController.index);
-      switch (_tabController.index) {
-        case 0:
-          provider.fetchPopularActors();
-          break;
-        case 1:
-          provider.searchActors(searchQuery);
-          break;
-      }
-      _scrollController.jumpTo(0); // Reset scroll position
-    }
-  }
-
   void _onScroll() {
-    final provider = Provider.of<ActorsProvider>(context, listen: false);
+    final provider = context.read<ActorsProvider>();
     if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent &&
         !provider.isLoading &&
-        provider.hasMorePages(_tabController.index)) {
-      switch (_tabController.index) {
-        case 0:
-          provider.fetchPopularActors();
-          break;
-        case 1:
-          provider.searchActors(searchQuery);
-          break;
+        provider.popularHasMorePages) {
+      if (searchQuery.isEmpty) {
+        provider.fetchPopularActors();
+      } else {
+        provider.searchActors(searchQuery);
       }
     }
   }
@@ -88,154 +67,141 @@ class _ActorsScreenState extends State<ActorsScreen> with SingleTickerProviderSt
       setState(() {
         searchQuery = query;
       });
-      if (_tabController.index == 1 && searchQuery.isNotEmpty) {
-        Provider.of<ActorsProvider>(context, listen: false).searchActors(searchQuery);
+      if (searchQuery.isEmpty) {
+        context.read<ActorsProvider>().fetchPopularActors();
+      } else {
+        context.read<ActorsProvider>().searchActors(searchQuery);
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: MediaQuery.of(context).size.height,
-      width: double.infinity,
-      child: Column(
+    return Scaffold(
+      backgroundColor: AppStyles.primaryColor,
+      body: Column(
         children: [
-          // Search Section
+          // Search field
           Container(
             decoration: BoxDecoration(
               color: AppStyles.secondaryColor,
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: TextField(
-                controller: TextEditingController(text: searchQuery),
-                decoration: InputDecoration(
-                  hintText: 'Search actors...',
-                  filled: true,
-                  fillColor: Colors.grey.shade100,
-                  border: OutlineInputBorder(
-                    borderRadius: const BorderRadius.all(Radius.circular(14.0)),
-                  ),
-                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.clear, color: Colors.grey),
-                    onPressed: () {
-                      setState(() {
-                        searchQuery = '';
-                      });
-                      Provider.of<ActorsProvider>(context, listen: false).searchActors('');
-                    },
-                  ),
+            padding: const EdgeInsets.all(10.0),
+            child: TextField(
+              controller: _textEditingController,
+              decoration: InputDecoration(
+                hintText: 'Search Popular actors...',
+                filled: true,
+                fillColor: Colors.grey.shade100,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14.0),
                 ),
-                onChanged: _onSearchChanged,
+                prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.clear, color: Colors.grey),
+                  onPressed: () {
+                    _textEditingController.clear();
+                    setState(() {
+                      searchQuery = '';
+                    });
+                    context.read<ActorsProvider>().fetchPopularActors();
+                  },
+                ),
               ),
+              onChanged: _onSearchChanged,
             ),
           ),
-          // TabBar Section
-          Material(
-            color: AppStyles.secondaryColor,
-            child: TabBar(
-              controller: _tabController,
-              labelColor: Colors.white,
-              indicatorColor: Colors.blueAccent,
-              unselectedLabelColor: Colors.white.withOpacity(0.6),
-              tabs: [
-                Tab(text: 'Popular'),
-                Tab(text: 'Search'),
-              ],
-            ),
-          ),
-          // Displaying either Search Results or Movies
+          // Results
           Expanded(
-            child: Consumer<ActorsProvider>(builder: (context, provider, _) {
-              if (provider.errorMessage != null && !provider.isLoading) {
-                return Center(child: Text(provider.errorMessage!));
-              }
-              List<Actor> actorsToDisplay =
-                  _tabController.index == 1 && searchQuery.isNotEmpty ? provider.searchResults : provider.popularActors;
+            child: Consumer<ActorsProvider>(
+              builder: (context, provider, _) {
+                final actorsToDisplay = searchQuery.isEmpty
+                    ? provider.popularActors
+                    : provider.searchResults;
 
-              return Skeletonizer(
-                enabled: provider.isLoading && actorsToDisplay.isEmpty,
-                child: actorsToDisplay.isEmpty && !provider.isLoading
-                    ? Center(child: Text('No actors found'))
-                    : GridView.builder(
-                        controller: _scrollController,
-                        padding: const EdgeInsets.all(8.0),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 10.0,
-                          mainAxisSpacing: 20.0,
-                          childAspectRatio: 1 / 1.3,
+                if (provider.errorMessage != null && !provider.isLoading) {
+                  return Center(child: Text(provider.errorMessage!));
+                }
+
+                return Skeletonizer(
+                  enabled: provider.isLoading && actorsToDisplay.isEmpty,
+                  child: actorsToDisplay.isEmpty
+                      ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.search_off, color: AppStyles.secondaryColor, size: 50),
+                        const SizedBox(height: 25),
+                        const Text(
+                          'No actors found',
+                          style: TextStyle(color: AppStyles.darkColor, fontSize: 20),
                         ),
-                        itemCount: actorsToDisplay.length,
-                        itemBuilder: (context, index) {
-                          final actor = actorsToDisplay[index];
-                          return GestureDetector(
-                            onTap: () {
-                              AnimatedNavigator.pushZoomIn(
-                                context,
-                                ActorScreen(actorId: actor.id!),
-                              );
-                            },
-                            child: Card(
-                              color: AppStyles.cardColor,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              elevation: 4,
-                              child: Column(
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(16),
-                                      topRight: Radius.circular(16),
-                                    ),
-                                    child: Image.network(
-                                      'https://image.tmdb.org/t/p/w500${actor.profilePath ?? ''}',
-                                      width: double.infinity,
-                                      height: 170,
-                                      fit: BoxFit.fill,
-                                      errorBuilder: (context, error, stackTrace) {
-                                        return Container(
-                                          width: double.infinity,
-                                          height: 160,
-                                          color: Colors.grey[300],
-                                          child: Icon(Icons.person, size: 50, color: Colors.grey[600]),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(2.0),
-                                    child: SizedBox(
-                                      width: double.infinity,
-                                      height: 35,
-                                      child: Center(
-                                        child: AutoSizeText(
-                                          maxLines: 2,
-                                          actor.name ?? "Unknown Actor",
-                                          textAlign: TextAlign.center,
-                                          minFontSize: 8,
-                                          maxFontSize: 12,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                      ],
+                    ),
+                  )
+                      : GridView.builder(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.all(8),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 20,
+                      childAspectRatio: 1 / 1.3,
+                    ),
+                    itemCount: actorsToDisplay.length,
+                    itemBuilder: (context, index) {
+                      final actor = actorsToDisplay[index];
+                      return GestureDetector(
+                        onTap: () {
+                          AnimatedNavigator.pushZoomIn(
+                            context,
+                            ActorScreen(actorId: actor.id!),
                           );
                         },
-                      ),
-              );
-            }),
+                        child: Card(
+                          color: AppStyles.cardColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          elevation: 4,
+                          child: Column(
+                            children: [
+                              ClipRRect(
+                                borderRadius: const BorderRadius.vertical(
+                                    top: Radius.circular(16)),
+                                child: Image.network(
+                                  'https://image.tmdb.org/t/p/w500${actor.profilePath ?? ''}',
+                                  width: double.infinity,
+                                  height: 170,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => const Icon(Icons.person,
+                                      color: Colors.white70, size: 50),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(4.0),
+                                child: AutoSizeText(
+                                  actor.name ?? "Unknown Actor",
+                                  maxLines: 2,
+                                  minFontSize: 8,
+                                  maxFontSize: 12,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
+            ),
           ),
         ],
       ),
     );
   }
 }
+

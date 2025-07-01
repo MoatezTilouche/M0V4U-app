@@ -17,10 +17,12 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     Future.delayed(const Duration(seconds: 3), () {
+
       Navigator.pushReplacement(
         context,
-        AnimatedRoute.slideFromBottom(MainScreen()),
+        AnimatedRoute.slideFromBottom(const MainScreen(), routeName: '/main'),
       );
+
     });
   }
 
